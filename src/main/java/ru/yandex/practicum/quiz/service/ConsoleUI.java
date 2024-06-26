@@ -1,5 +1,8 @@
 package ru.yandex.practicum.quiz.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.quiz.config.QuizConfig;
 import ru.yandex.practicum.quiz.model.Question;
@@ -10,17 +13,24 @@ import java.util.Scanner;
 
 @Component
 public class ConsoleUI {
+    private static final Logger logger = LoggerFactory.getLogger(ConsoleUI.class);
+
     private final Scanner input;
     private final QuizLog quizLogger;
     private final List<Question> questions;
+    private final String quizTitle;
 
-    public ConsoleUI(QuizConfig quizConfig) {
+    public ConsoleUI(@Value("${spring-quiz.title:\"Неназванный тест\"}") String title,
+                     QuizConfig quizConfig) {
         this.questions = quizConfig.getQuestions();
         this.input = new Scanner(System.in);
         this.quizLogger = new QuizLog(questions.size());
+        this.quizTitle = title;
     }
     public QuizLog startQuiz() {
-        System.out.println("\nЗдравствуйте, приступаем к тесту \"Тест по Spring Framework\"!\n");
+        System.out.println("\nЗдравствуйте, приступаем к тесту " + quizTitle + "\n");
+
+        logger.debug("Начинаем квиз. Количество вопросов: {}", questions.size());
 
         for (int questionIdx = 0; questionIdx < questions.size(); questionIdx++) {
             Question question = questions.get(questionIdx);
@@ -30,6 +40,7 @@ public class ConsoleUI {
         return quizLogger;
     }
     private void processQuestion(int questionNumber, Question question) {
+        logger.trace("Выводим вопрос №{}, количество попыток: {}", questionNumber, question.getAttempts());
 
         for(int attemptIdx = 0; attemptIdx < question.getAttempts(); attemptIdx++) {
             System.out.println("\n");
@@ -41,7 +52,7 @@ public class ConsoleUI {
                 break;
             } else {
                 if(attemptIdx+1 < question.getAttempts()) {
-                    System.out.println("К сожалению ваш ответ неверный, но вы можете попробовать еще раз");
+                    System.out.println("К сожалению, ваш ответ неверный, но вы можете попробовать ещё раз");
                 }
             }
         }

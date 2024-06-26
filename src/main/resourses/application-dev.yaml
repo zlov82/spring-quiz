@@ -1,0 +1,13 @@
+spring:
+  main:
+    log-startup-info: true
+    banner-mode: off
+
+logging.level:
+  ru.yandex.practicum.quiz: TRACE # уровень логировани для пакета
+#  ru.yandex.practicum.quiz.QuizApp: TRACE # настраиваем уровень логера для конкретного класса
+
+
+spring-quiz:
+  title: "Подключен тестовый профиль"
+
